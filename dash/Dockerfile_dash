@@ -1,0 +1,14 @@
+# Dockerfile pour le conteneur du dashboard 
+FROM python:3.8
+
+# Répertoire de travail utilisé pour notre projet
+WORKDIR /app
+
+COPY . /app
+
+RUN pip install -r requirements.txt
+
+EXPOSE 8050
+
+# Commande  pour exécuter l'application app
+CMD ["python", "app.py", "--ip=0.0.0.0"]

@@ -1,0 +1,43 @@
+version: "3.8"
+
+
+# 3 conteneurs :
+# un pour le dashboard (visualisation de nos analyses) qui dépend de mongo
+# un pour mongo (utilisation de l'image officielle de mongo pour Docker) pour le stockage des données
+# un pour le scraping des données qui dépend de mongo
+
+
+services:
+  dash:
+    build:
+      context: ./dash # il faut aller dans le sous dossier dash
+      dockerfile: Dockerfile_dash
+    ports:
+      - "8050:8050" #port utilisé pour lancer l'app en ligne
+    depends_on:
+      - mongo  
+    environment:
+      MONGO_URI: "mongodb://mongodb:27017/"  # Avec le nom du conteneur de mongo pour la connexion
+    command: ["python", "app.py", "--ip=0.0.0.0"]
+
+
+  mongo:  #utilisation de mongo dans Docker, indépendamment de mongoDB et mongosh sur nos machines
+    image: mongo
+    container_name: mongodb # Nom du conteneur donné à mongo, dont on a besoin pour les 2 autres conteneurs
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ./data/mongo:/data/db
+    ports:
+      - 27017:27017
+
+
+  scraper:
+    build:
+      context: ./scraping
+      dockerfile: Dockerfile_scrap
+    depends_on:
+      - mongo  
+    environment:
+      MONGO_URI: "mongodb://mongodb:27017/"  # Pour la connexion au mongo (dans le conteneur mongodb)

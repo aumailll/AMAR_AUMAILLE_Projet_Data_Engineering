@@ -1,0 +1,13 @@
+# Dockerfile pour le conteneur scraping de nos données 
+FROM python:3.8
+
+RUN apt-get update
+
+WORKDIR /app
+
+COPY . /app
+
+RUN pip install -r requirements.txt
+
+# Commande pour lancer le scraping et ainsi la récupération de nos données 
+CMD ["scrapy", "crawl", "anime"]
